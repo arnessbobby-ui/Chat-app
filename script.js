@@ -1,22 +1,34 @@
 async function sendMessage() {
-  const userInput = document.getElementById("user-input").value;
-  const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("user-input");
+  const message = input.value.trim();
+  if (!message) return;
 
-  // Show user message
-  messagesDiv.innerHTML += `<div><b>You:</b> ${userInput}</div>`;
+  const chatBox = document.getElementById("chat-box");
+  const userMessage = document.createElement("div");
+  userMessage.textContent = "You: " + message;
+  chatBox.appendChild(userMessage);
+
+  input.value = "";
 
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userInput }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
     });
 
     const data = await response.json();
 
-    // Show AI response
-    messagesDiv.innerHTML += `<div><b>AI:</b> ${data.reply}</div>`;
+    const botMessage = document.createElement("div");
+    botMessage.textContent = "Bot: " + data.reply;
+    chatBox.appendChild(botMessage);
+
   } catch (error) {
-    messagesDiv.innerHTML += `<div><b>AI:</b> Error connecting to server.</div>`;
+    console.error("Error:", error);
+    const errorMessage = document.createElement("div");
+    errorMessage.textContent = "Error: Unable to get response";
+    chatBox.appendChild(errorMessage);
   }
 }
