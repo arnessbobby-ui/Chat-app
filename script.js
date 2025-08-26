@@ -1,19 +1,22 @@
-// Replace with your real OpenAI API key
-const API_KEY = "YOUR_API_KEY_HERE";
+async function sendMessage() {
+  const userInput = document.getElementById("user-input").value;
+  const messagesDiv = document.getElementById("messages");
 
-async function sendMessage(message) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: message }]
-    })
-  });
+  // Show user message
+  messagesDiv.innerHTML += `<div><b>You:</b> ${userInput}</div>`;
 
-  const data = await response.json();
-  return data.choices[0].message.content;
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userInput }),
+    });
+
+    const data = await response.json();
+
+    // Show AI response
+    messagesDiv.innerHTML += `<div><b>AI:</b> ${data.reply}</div>`;
+  } catch (error) {
+    messagesDiv.innerHTML += `<div><b>AI:</b> Error connecting to server.</div>`;
+  }
 }
